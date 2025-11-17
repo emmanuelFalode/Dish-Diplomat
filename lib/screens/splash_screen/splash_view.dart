@@ -1,7 +1,7 @@
-import 'dart:ffi';
+
 
 import 'package:flutter/material.dart';
-import 'package:foodapp/screens/Sign-in-up/signin.dart';
+
 import 'package:foodapp/screens/onboarding/onboarding.dart';
 
 class SplashView extends StatefulWidget {

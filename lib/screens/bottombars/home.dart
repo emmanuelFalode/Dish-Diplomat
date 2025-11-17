@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:foodapp/providers/me_provider.dart';
 import 'package:foodapp/screens/bottombars/widget/catergory_cell.dart';
 import 'package:foodapp/widgets/color_extension.dart';
 import 'package:foodapp/screens/bottombars/widget/most_popular_cell.dart';
@@ -7,14 +9,14 @@ import 'package:foodapp/screens/bottombars/widget/recent_items.dart';
 import 'package:foodapp/screens/bottombars/widget/view_all_title_rows.dart';
 import 'package:go_router/go_router.dart';
 
-class Home extends StatefulWidget {
+class Home extends ConsumerStatefulWidget {
   const Home({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  ConsumerState<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends ConsumerState<Home> {
   TextEditingController txtsearch = TextEditingController();
 
   List catArr = [
@@ -105,8 +107,16 @@ class _HomeState extends State<Home> {
     },
   ];
 
+  String _greeting() {
+    final h = DateTime.now().hour;
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final meAsync = ref.watch(meProvider);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -114,20 +124,59 @@ class _HomeState extends State<Home> {
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Good Day Mayowa, ",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      context.push("/cart");
-                    },
-                    icon: const Icon(Icons.shopping_cart, size: 30),
-                  ),
-                ],
+              child: meAsync.when(
+                data: (me) {
+                  final first = (me['first_name'] ?? '').toString().trim();
+
+                  final name = [first].where((s) => s.isNotEmpty).join(' ');
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${_greeting()} ${name.isEmpty ? 'Friend' : name},',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => context.push("/cart"),
+                        icon: const Icon(Icons.shopping_cart, size: 30),
+                      ),
+                    ],
+                  );
+                },
+                loading:
+                    () => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        Text(
+                          'Good day …',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Icon(Icons.shopping_cart, size: 30),
+                      ],
+                    ),
+                error:
+                    (e, _) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Good day,',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => context.push("/cart"),
+                          icon: const Icon(Icons.shopping_cart, size: 30),
+                        ),
+                      ],
+                    ),
               ),
             ),
             const SizedBox(height: 20),

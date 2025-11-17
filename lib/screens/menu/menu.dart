@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/screens/menu/menu_items.dart';
 import 'package:foodapp/widgets/color_extension.dart';
+import 'package:go_router/go_router.dart';
 
 class Menu extends StatefulWidget {
   const Menu({super.key});
@@ -50,7 +51,9 @@ class _MenuState extends State<Menu> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.push("/cart");
+                    },
                     icon: const Icon(Icons.shopping_cart, size: 28),
                   ),
                 ],

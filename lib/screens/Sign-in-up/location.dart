@@ -1,3 +1,4 @@
+import 'package:face_detector_plugin/face_detector_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,7 +35,7 @@ class _LocationState extends State<Location> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ElevatedButton(
                 onPressed: () {
-                  context.go("/");
+                  context.push('/bottom');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,

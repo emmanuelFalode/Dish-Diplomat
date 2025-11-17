@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/screens/bottombars/home.dart';
+import 'package:foodapp/screens/bottombars/order.dart';
 import 'package:foodapp/screens/menu/menu.dart';
-import 'package:foodapp/screens/bottombars/notification.dart';
+import 'package:foodapp/screens/bottombars/contact.dart';
 import 'package:foodapp/screens/bottombars/profile.dart';
 import 'package:foodapp/widgets/color_extension.dart';
 
@@ -18,8 +19,8 @@ class _BottomBarPageState extends State<BottomBarPage> {
   final List<Widget> pages = [
     Home(),
     Menu(),
-    Notifications(),
-    Notifications(),
+    OrdersPage(),
+    CustomerCarePage(),
     Profile(),
   ];
 
@@ -53,9 +54,9 @@ class _BottomBarPageState extends State<BottomBarPage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _buildTabIcon(1, Icons.menu),
-            _buildTabIcon(2, Icons.apps_sharp),
+            _buildTabIcon(2, Icons.shopping_bag_outlined),
             const SizedBox(width: 40), // Space for FAB
-            _buildTabIcon(3, Icons.notifications),
+            _buildTabIcon(3, Icons.support_agent),
             _buildTabIcon(4, Icons.person),
           ],
         ),

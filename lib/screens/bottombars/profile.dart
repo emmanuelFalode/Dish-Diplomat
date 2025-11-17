@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:foodapp/core/auth_storage.dart';
 import 'package:foodapp/providers/dish_api.dart';
+import 'package:foodapp/providers/me_provider.dart';
 import 'package:foodapp/providers/theme_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,19 +22,48 @@ class _ProfileState extends ConsumerState<Profile> {
   @override
   Widget build(BuildContext context) {
     final profiler = ref.watch(profileProvider);
-
+    final meAsync = ref.watch(meProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text("Settings"), elevation: 0.5),
+      appBar: AppBar(title: const Text("Profile"), elevation: 0.5),
       body: SafeArea(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-              child: _ProfileHeader(
-                name: "David Zibrin",
-                email: "zibrin@gmail.com",
-                avatarAsset: 'assets/images/avi.avif',
-                onEdit: () {},
+              child: meAsync.when(
+                data: (me) {
+                  final first = (me['first_name'] ?? '').toString().trim();
+                  final last = (me['last_name'] ?? '').toString().trim();
+                  final name = [
+                    first,
+                    last,
+                  ].where((s) => s.isNotEmpty).join(' ');
+                  final email = (me['email'] ?? '').toString();
+
+                  return _ProfileHeader(
+                    name: name.isEmpty ? 'User' : name,
+                    email: email.isEmpty ? '—' : email,
+                    avatarAsset: 'assets/images/avi.avif',
+                    onEdit: () async {
+                      await context.push("/edit_profile");
+                      ref.invalidate(meProvider);
+                    },
+                  );
+                },
+                loading:
+                    () => _ProfileHeader(
+                      name: 'Loading…',
+                      email: 'Fetching profile',
+                      avatarAsset: 'assets/images/avi.avif',
+                      onEdit: () {},
+                    ),
+                error:
+                    (e, _) => _ProfileHeader(
+                      name: '—',
+                      email: e.toString(),
+                      avatarAsset: 'assets/images/avi.avif',
+                      onEdit: () {},
+                    ),
               ),
             ),
 
@@ -46,13 +76,17 @@ class _ProfileState extends ConsumerState<Profile> {
                     icon: Icons.person_outline,
                     title: 'Edit Profile',
                     subtitle: 'Name, phone number, address',
-                    onTap: () {},
+                    onTap: () {
+                      context.push("/edit_profile");
+                    },
                   ),
                   _SettingTile(
                     icon: Icons.lock_outline,
                     title: 'Change Password',
                     subtitle: 'Update your password',
-                    onTap: () {},
+                    onTap: () {
+                      context.push('/change_password');
+                    },
                   ),
                   _SettingTile(
                     icon: Icons.credit_card_outlined,
@@ -221,15 +255,6 @@ class _ProfileHeader extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          TextButton.icon(
-            onPressed: onEdit,
-            icon: const Icon(
-              Icons.edit_outlined,
-              size: 18,
-              color: Colors.black,
-            ),
-            label: const Text('Edit', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),

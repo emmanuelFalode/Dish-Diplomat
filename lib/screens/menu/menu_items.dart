@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/screens/menu/widget/items_details.dart';
 import 'package:foodapp/screens/menu/widget/menu_item_rows.dart';
+import 'package:go_router/go_router.dart';
 
 class MenuItems extends StatefulWidget {
   final Map? mobj;
@@ -122,7 +123,9 @@ class _MenuItemsState extends State<MenuItems> with TickerProviderStateMixin {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.push("/cart");
+                    },
                     icon: const Icon(Icons.shopping_cart, size: 28),
                   ),
                 ],

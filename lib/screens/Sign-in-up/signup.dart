@@ -172,7 +172,8 @@ class _SignupState extends State<Signup> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          result['message'] ?? 'Error',
+                                          result['message'] ??
+                                              'An error Occurred',
                                         ),
                                       ),
                                     );
@@ -181,7 +182,10 @@ class _SignupState extends State<Signup> {
                                       Future.delayed(
                                         const Duration(milliseconds: 500),
                                         () {
-                                          context.push('/signin');
+                                          context.push(
+                                            '/verify_email',
+                                            extra: {'email': email.text},
+                                          );
                                         },
                                       );
                                     }
@@ -240,10 +244,10 @@ class _SignupState extends State<Signup> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              context.go('/signin');
+                              context.push('/signin');
                             },
                             child: const Text(
-                              " Log In",
+                              "Log In",
                               style: TextStyle(
                                 color: Colors.deepOrange,
                                 fontWeight: FontWeight.w600,

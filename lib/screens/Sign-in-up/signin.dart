@@ -120,7 +120,7 @@ class _SigninState extends State<Signin> {
             child: Container(
               padding: const EdgeInsets.fromLTRB(30, 50, 30, 20),
               decoration: const BoxDecoration(
-              
+                color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),
@@ -295,12 +295,7 @@ class _SigninState extends State<Signin> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Signup(),
-                                ),
-                              );
+                              context.push('/signup');
                             },
                             child: const Text(
                               " Sign Up",
