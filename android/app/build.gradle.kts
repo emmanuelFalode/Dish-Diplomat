@@ -8,11 +8,11 @@ plugins {
 android {
     namespace = "com.example.foodapp"
     compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "26.3.11579264"
 
     defaultConfig {
         applicationId = "com.example.foodapp"
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName

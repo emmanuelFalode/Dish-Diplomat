@@ -23,6 +23,7 @@ class _SigninState extends State<Signin> {
   final passwordcontroller = TextEditingController();
   bool _isLoading = false;
   bool _rememberMe = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -31,58 +32,58 @@ class _SigninState extends State<Signin> {
     super.dispose();
   }
 
-  Future<void> _handleSignIn() async {
-    // Validate form
-    if (!(_formSignInKey.currentState?.saveAndValidate() ?? false)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fix the errors in the form')),
-      );
-      return;
-    }
+  // Future<void> _handleSignIn() async {
+  //   // Validate form
+  //   if (!(_formSignInKey.currentState?.saveAndValidate() ?? false)) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Please fix the errors in the form')),
+  //     );
+  //     return;
+  //   }
 
-    // Hide keyboard
-    FocusScope.of(context).unfocus();
+  //   // Hide keyboard
+  //   FocusScope.of(context).unfocus();
 
-    setState(() => _isLoading = true);
+  //   setState(() => _isLoading = true);
 
-    try {
-      final result = await ApiService.login({
-        'email': emailcontroller.text.trim(),
-        'password': passwordcontroller.text,
-      });
+  //   try {
+  //     final result = await ApiService.login({
+  //       'email': emailcontroller.text.trim(),
+  //       'password': passwordcontroller.text,
+  //     });
 
-      if (result['success'] == true) {
-        final token = (result['token'] ?? '') as String;
-        if (token.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No token returned from server')),
-          );
-          setState(() => _isLoading = false);
-          return;
-        }
+  //     if (result['success'] == true) {
+  //       final token = (result['token'] ?? '') as String;
+  //       if (token.isEmpty) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(content: Text('No token returned from server')),
+  //         );
+  //         setState(() => _isLoading = false);
+  //         return;
+  //       }
 
-        // Save token (rememberMe could control persistence strategy if you want)
-        await AuthStorage.saveToken(token);
+  //       // Save token (rememberMe could control persistence strategy if you want)
+  //       await AuthStorage.saveToken(token);
 
-        // Success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'] ?? 'Login successful')),
-        );
+  //       // Success message
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text(result['message'] ?? 'Login successful')),
+  //       );
 
-        if (mounted) context.push('/location');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'] ?? 'Login failed')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Login error: $e')));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
+  //       if (mounted) context.push('/location');
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text(result['message'] ?? 'Login failed')),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(SnackBar(content: Text('Login error: $e')));
+  //   } finally {
+  //     if (mounted) setState(() => _isLoading = false);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -159,8 +160,8 @@ class _SigninState extends State<Signin> {
                       // Password
                       FormBuilderTextField(
                         name: "password",
-                        obscureText: true,
                         controller: passwordcontroller,
+                        obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           labelText: "Password",
                           hintText: "Enter your password",
@@ -168,6 +169,20 @@ class _SigninState extends State<Signin> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           prefixIcon: const Icon(Icons.lock_outline),
+
+                          // 👇 Toggle visibility icon
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
                         ),
                         validator: FormBuilderValidators.compose([
                           FormBuilderValidators.required(
@@ -232,7 +247,7 @@ class _SigninState extends State<Signin> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          onPressed: _isLoading ? null : _handleSignIn,
+                          onPressed: _isLoading ? null : () => context.push('/location'),
                           child:
                               _isLoading
                                   ? const SizedBox(

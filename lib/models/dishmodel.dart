@@ -3,6 +3,7 @@ class Dishmodel {
   final String lastName;
   final String email;
   final String phoneNumber;
+  final String address;
   final String password;
 
   Dishmodel({
@@ -10,6 +11,7 @@ class Dishmodel {
     required this.lastName,
     required this.email,
     required this.phoneNumber,
+    required this.address,
     required this.password,
   });
 
@@ -21,6 +23,7 @@ class Dishmodel {
       'last_name': lastName,
       'email': email,
       'phone_number': phoneNumber,
+      'address': address,
       'password': password,
     };
   }
@@ -32,6 +35,7 @@ class Dishmodel {
       lastName: map['last_name'] ?? '',
       email: map['email'] ?? '',
       phoneNumber: map['phone_number'] ?? '',
+      address: map['address'] ?? '',
       password: map['password'] ?? '',
     );
   }

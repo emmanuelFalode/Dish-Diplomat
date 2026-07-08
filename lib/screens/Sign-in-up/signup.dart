@@ -22,6 +22,7 @@ class _SignupState extends State<Signup> {
   final email = TextEditingController();
   final phonenumber = TextEditingController();
   final password = TextEditingController();
+  final address = TextEditingController();
   bool _isLoading = false; // Loader flag
 
   @override
@@ -120,6 +121,24 @@ class _SignupState extends State<Signup> {
                       ),
                       const SizedBox(height: 20),
                       FormBuilderTextField(
+                        name: "Address",
+                        controller: address,
+                        decoration: InputDecoration(
+                          labelText: "Address",
+                          hintText: "Enter your address",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          prefixIcon: const Icon(Icons.location_on_outlined),
+                        ),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                            errorText: "This field is required",
+                          ),
+                        ]),
+                      ),
+                      const SizedBox(height: 20),
+                      FormBuilderTextField(
                         name: "Password",
                         controller: password,
                         decoration: InputDecoration(
@@ -160,6 +179,7 @@ class _SignupState extends State<Signup> {
                                       lastName: lastname.text,
                                       email: email.text,
                                       phoneNumber: phonenumber.text,
+                                      address: address.text,
                                       password: password.text,
                                     );
 
