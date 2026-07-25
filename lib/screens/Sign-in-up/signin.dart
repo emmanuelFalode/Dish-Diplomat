@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:foodapp/models/login_model.dart';
+import 'package:foodapp/providers/auth_provider.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 import 'package:foodapp/providers/dish_api.dart';
 import 'package:foodapp/screens/Sign-in-up/widget/custom_scaffold.dart';
@@ -10,18 +13,18 @@ import 'package:foodapp/screens/Sign-in-up/signup.dart';
 // add this import for token storage
 import 'package:foodapp/core/auth_storage.dart';
 
-class Signin extends StatefulWidget {
+class Signin extends ConsumerStatefulWidget {
   const Signin({super.key});
 
   @override
-  State<Signin> createState() => _SigninState();
+  ConsumerState<Signin> createState() => _SigninState();
 }
 
-class _SigninState extends State<Signin> {
+class _SigninState extends ConsumerState<Signin> {
   final _formSignInKey = GlobalKey<FormBuilderState>();
   final emailcontroller = TextEditingController();
   final passwordcontroller = TextEditingController();
-  bool _isLoading = false;
+
   bool _rememberMe = false;
   bool _obscurePassword = true;
 
@@ -60,6 +63,10 @@ class _SigninState extends State<Signin> {
   //         );
   //         setState(() => _isLoading = false);
   //         return;
+  //       } else if (result["success"] == false) {
+  //         ScaffoldMessenger.of(
+  //           context,
+  //         ).showSnackBar(const SnackBar(content: Text('Invalid Credentials')));
   //       }
 
   //       // Save token (rememberMe could control persistence strategy if you want)
@@ -85,8 +92,40 @@ class _SigninState extends State<Signin> {
   //   }
   // }
 
+  Future<void> _signIn() async {
+    if (!(_formSignInKey.currentState?.saveAndValidate() ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fix the errors in the form')),
+      );
+      return;
+    }
+    final loginModel = LoginModel(
+      email: emailcontroller.text,
+      password: passwordcontroller.text,
+    );
+
+    await ref.read(authProvider.notifier).login(loginModel);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
+    ref.listen<AuthSate>(authProvider, (previous, next) {
+      if (next.errorMessage != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+      }
+
+      if (next.loginResponse != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.loginResponse!.message)));
+
+        context.push('/location');
+      }
+    });
     return CustomScaffold(
       child: Column(
         children: [
@@ -247,9 +286,9 @@ class _SigninState extends State<Signin> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          onPressed: _isLoading ? null : () => context.push('/location'),
+                          onPressed: authState.isLoading ? null : _signIn,
                           child:
-                              _isLoading
+                              authState.isLoading
                                   ? const SizedBox(
                                     height: 20,
                                     width: 20,
@@ -291,11 +330,11 @@ class _SigninState extends State<Signin> {
                       // Social Icons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Brand(Brands.facebook),
-                          Brand(Brands.twitterx),
-                          Brand(Brands.google),
-                          Brand(Brands.apple_logo),
+                        children: const [
+                          FaIcon(FontAwesomeIcons.facebook),
+                          FaIcon(FontAwesomeIcons.xTwitter),
+                          FaIcon(FontAwesomeIcons.google),
+                          FaIcon(FontAwesomeIcons.apple),
                         ],
                       ),
 

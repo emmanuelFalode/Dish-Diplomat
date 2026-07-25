@@ -24,7 +24,7 @@ class _ProfileState extends ConsumerState<Profile> {
     final profiler = ref.watch(profileProvider);
     final meAsync = ref.watch(meProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text("Profile"), elevation: 0.5),
+      appBar: AppBar(title: const Text("Profile"), elevation: 0.5, automaticallyImplyLeading: false,),
       body: SafeArea(
         child: Column(
           children: [

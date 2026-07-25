@@ -1,51 +1,127 @@
 import 'package:dio/dio.dart';
 
-class DioExceptionHandler {
-  static Map<String, dynamic> handle(DioException e) {
-    String message = "Something went wrong";
+class DioExceptions implements Exception {
+  final String message;
 
-    switch (e.type) {
+  DioExceptions({
+    required this.message,
+  });
+
+  static DioExceptions fromDioError(DioException dioError) {
+    final responseData = dioError.response?.data;
+    final statusCode = dioError.response?.statusCode;
+
+    switch (dioError.type) {
+      case DioExceptionType.cancel:
+        return DioExceptions(
+          message: "Request to API server was cancelled",
+        );
+
       case DioExceptionType.connectionTimeout:
-        message = "Connection timeout. Server took too long to respond.";
-        break;
-
       case DioExceptionType.sendTimeout:
-        message = "Send timeout. Failed to send request in time.";
-        break;
-
       case DioExceptionType.receiveTimeout:
-        message = "Receive timeout. Server is not responding.";
-        break;
+      case DioExceptionType.transformTimeout:
+        return DioExceptions(
+          message: "Request timed out. Please try again.",
+        );
 
       case DioExceptionType.badResponse:
-        final status = e.response?.statusCode;
-        final data = e.response?.data;
-
-        if (status == 422 && data is Map && data['errors'] != null) {
-          // Extract first error message dynamically
-          final errors = data['errors'] as Map<String, dynamic>;
-          message = errors.values.first[0];
-        } else {
-          message = data?['message'] ?? "Server returned an error ($status)";
-        }
-        break;
-
-      case DioExceptionType.cancel:
-        message = "Request cancelled.";
-        break;
+        return DioExceptions(
+          message: _getErrorMessage(
+            statusCode,
+            responseData,
+          ),
+        );
 
       case DioExceptionType.connectionError:
-        message = "Network error. Check your internet connection.";
-        break;
+        return DioExceptions(
+          message: "No Internet connection. Please check your connection.",
+        );
+
+      case DioExceptionType.badCertificate:
+        return DioExceptions(
+          message: "Bad SSL certificate.",
+        );
 
       case DioExceptionType.unknown:
-        message = "Unexpected error occurred.";
-        break;
-      case DioExceptionType.badCertificate:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return DioExceptions(
+          message: "Unexpected error occurred.",
+        );
+    }
+  }
+
+  static String _getErrorMessage(
+    int? statusCode,
+    dynamic data,
+  ) {
+    // Laravel returned a JSON object
+    if (data is Map<String, dynamic>) {
+      final message = data['message'];
+
+      // Example:
+      // {
+      //   "message": "Invalid credentials"
+      // }
+      if (message is String && message.isNotEmpty) {
+        return message;
+      }
+
+      // Handle Laravel validation errors
+      // Example:
+      // {
+      //   "message": "The given data was invalid.",
+      //   "errors": {
+      //     "email": [
+      //       "The email field is required."
+      //     ]
+      //   }
+      // }
+      final errors = data['errors'];
+
+      if (errors is Map) {
+        for (final error in errors.values) {
+          if (error is List && error.isNotEmpty) {
+            return error.first.toString();
+          }
+
+          if (error is String && error.isNotEmpty) {
+            return error;
+          }
+        }
+      }
     }
 
-    return {"success": false, "message": message};
+    // Fallback based on HTTP status code
+    switch (statusCode) {
+      case 400:
+        return 'Bad request. Please check your request and try again.';
+
+      case 401:
+        return 'Invalid login credentials.';
+
+      case 403:
+        return 'Access to this resource is forbidden.';
+
+      case 404:
+        return 'The resource you requested was not found.';
+
+      case 409:
+        return 'A conflict occurred. Please try again.';
+
+      case 422:
+        return 'Please check the information you provided.';
+
+      case 500:
+        return 'There was an internal server error.';
+
+      case 502:
+        return 'The server received an invalid response.';
+
+      default:
+        return 'Unexpected error. Status code: $statusCode';
+    }
   }
+
+  @override
+  String toString() => message;
 }

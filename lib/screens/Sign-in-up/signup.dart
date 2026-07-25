@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:foodapp/models/dishmodel.dart';
 import 'package:foodapp/providers/dish_api.dart';
 import 'package:foodapp/reusables/form_text_fields.dart';
@@ -6,7 +7,7 @@ import 'package:foodapp/screens/Sign-in-up/widget/custom_scaffold.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
-import 'package:icons_plus/icons_plus.dart';
+
 import 'signin.dart';
 
 class Signup extends StatefulWidget {
@@ -119,24 +120,24 @@ class _SignupState extends State<Signup> {
                         hint: "09134711899",
                         icon: Icons.phone,
                       ),
-                      const SizedBox(height: 20),
-                      FormBuilderTextField(
-                        name: "Address",
-                        controller: address,
-                        decoration: InputDecoration(
-                          labelText: "Address",
-                          hintText: "Enter your address",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          prefixIcon: const Icon(Icons.location_on_outlined),
-                        ),
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(
-                            errorText: "This field is required",
-                          ),
-                        ]),
-                      ),
+                      // const SizedBox(height: 20),
+                      // FormBuilderTextField(
+                      //   name: "Address",
+                      //   controller: address,
+                      //   decoration: InputDecoration(
+                      //     labelText: "Address",
+                      //     hintText: "Enter your address",
+                      //     border: OutlineInputBorder(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //     ),
+                      //     prefixIcon: const Icon(Icons.location_on_outlined),
+                      //   ),
+                      //   validator: FormBuilderValidators.compose([
+                      //     FormBuilderValidators.required(
+                      //       errorText: "This field is required",
+                      //     ),
+                      //   ]),
+                      // ),
                       const SizedBox(height: 20),
                       FormBuilderTextField(
                         name: "Password",
@@ -247,11 +248,11 @@ class _SignupState extends State<Signup> {
                       const SizedBox(height: 25),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Brand(Brands.facebook),
-                          Brand(Brands.twitterx),
-                          Brand(Brands.google),
-                          Brand(Brands.apple_logo),
+                        children: const [
+                          FaIcon(FontAwesomeIcons.facebook),
+                          FaIcon(FontAwesomeIcons.xTwitter),
+                          FaIcon(FontAwesomeIcons.google),
+                          FaIcon(FontAwesomeIcons.apple),
                         ],
                       ),
                       const SizedBox(height: 25),

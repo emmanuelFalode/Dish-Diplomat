@@ -31,7 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  icons_plus: ^5.0.0
   http: ^0.13.6
   flutter_form_builder: ^10.1.0
   form_builder_validators: ^11.1.2
@@ -47,6 +46,8 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   url_launcher: ^6.3.2
   camera_android: ^0.10.10+6
+  font_awesome_flutter: ^11.0.0
+  shared_preferences: ^2.5.5
   # face_detector_plugin:
   #   path: ./face_detector_plugin
 

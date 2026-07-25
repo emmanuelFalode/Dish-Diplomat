@@ -3,6 +3,8 @@
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:foodapp/models/login_model.dart';
+import 'package:foodapp/models/login_response_model.dart';
 import 'package:foodapp/providers/dio_exception.dart';
 import 'package:foodapp/providers/service_api.dart';
 
@@ -17,7 +19,6 @@ class ApiService {
           'Content-Type': 'application/json',
         },
         responseType: ResponseType.json,
-        validateStatus: (_) => true,
       ),
     )
     ..interceptors.add(
@@ -38,65 +39,22 @@ class ApiService {
 
       return {"success": true, "data": res.data, "status": res.statusCode};
     } on DioException catch (e) {
-      return DioExceptionHandler.handle(e);
-    } catch (e) {
-      return {"success": false, "message": "Unexpected Error: $e"};
+      throw DioExceptions.fromDioError(e);
     }
   }
 
-  static Future<Map<String, dynamic>> login(
-    Map<String, dynamic> payload,
-  ) async {
+
+
+  static Future<LoginResponseModel> login(LoginModel loginModel) async {
     try {
-      final res = await _dio.post(ServiceApi.login, data: payload);
-      return {"success": true, "data": res.data, "status": res.statusCode};
+      final res = await _dio.post(ServiceApi.login, data: loginModel.toJson());
+
+      return LoginResponseModel.fromJson(res.data);
     } on DioException catch (e) {
-      return DioExceptionHandler.handle(e);
-    } catch (e) {
-      return {"success": false, "message": "Unexpected Error $e"};
+      throw DioExceptions.fromDioError(e);
     }
   }
 
-  // static Future<Map<String, dynamic>> login(
-  //   Map<String, dynamic> payload,
-  // ) async {
-  //   try {
-  //     final res = await _dio.post('/api/login', data: payload);
-
-  //     print('🔍 Status: ${res.statusCode}');
-  //     print('🔍 Data: ${res.data}');
-
-  //     if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
-  //       return Map<String, dynamic>.from(res.data);
-  //     }
-
-  //     if (res.statusCode == 422 && res.data is Map<String, dynamic>) {
-  //       return {
-  //         'success': false,
-  //         'message': 'Validation failed',
-  //         'errors': (res.data as Map)['errors'] ?? res.data,
-  //       };
-  //     }
-
-  //     final msg =
-  //         (res.data is Map && (res.data as Map)['message'] != null)
-  //             ? (res.data as Map)['message']
-  //             : 'Request failed with status ${res.statusCode}';
-
-  //     return {'success': false, 'message': msg, 'raw': res.data};
-  //   } on DioException catch (e) {
-  //     print('❌ DioException: ${e.type} ${e.message}');
-  //     final data = e.response?.data;
-  //     final msg =
-  //         (data is Map && data['message'] != null)
-  //             ? data['message']
-  //             : 'Network error: ${e.message}';
-  //     return {'success': false, 'message': msg, 'raw': data};
-  //   } catch (e) {
-  //     print('❌ Unexpected error: $e');
-  //     return {'success': false, 'message': 'Unexpected error: $e'};
-  //   }
-  // }
 
   static Future<Map<String, dynamic>> logout(String token) async {
     try {
