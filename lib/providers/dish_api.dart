@@ -3,6 +3,7 @@
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:foodapp/interceptors/auth_interceptors.dart';
 import 'package:foodapp/models/login_model.dart';
 import 'package:foodapp/models/login_response_model.dart';
 import 'package:foodapp/providers/dio_exception.dart';
@@ -21,13 +22,17 @@ class ApiService {
         responseType: ResponseType.json,
       ),
     )
+
+    ..interceptors.add(
+      AuthInterceptors()
+    )
     ..interceptors.add(
       LogInterceptor(
         request: true,
         requestBody: true,
         responseBody: true,
         responseHeader: false,
-        requestHeader: false,
+        requestHeader: true,
       ),
     );
 
@@ -53,7 +58,7 @@ class ApiService {
     } on DioException catch (e) {
       throw DioExceptions.fromDioError(e);
     }
-  }
+  } 
 
 
   static Future<Map<String, dynamic>> logout(String token) async {
